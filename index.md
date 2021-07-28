@@ -1,5 +1,5 @@
 
-
+### OPENCV CUDA 10 ARCH BIN >3.0 (aka pre-build) IS [HERE](https://mega.nz/file/TipGURQT#aeWBPcYdLQtbP1Llnw7Mq8RWuniDVddKZM1PDlWca8Y)
 
 ### Welcome to the project of FNFBot
 
@@ -12,7 +12,7 @@ In this page we are going to show you how to compile the code.
 ### **THIS IS FOR BUILD ONLY**
 ### **If you want the executable, go there** [Download](https://github.com/Edouard127/Fnf_bot/releases)
 
-Step 1: Download the pre-built library [Download](https://github.com/opencv/opencv/releases/download/4.5.2/opencv-4.5.2-vc14_vc15.exe)
+Step 1: Download the pre-built library [Download](https://github.com/opencv/opencv/releases/download/4.5.3/opencv-4.5.3-vc14_vc15.exe)
 
 Run the downloaded .exe file to extract the archive.
 
