@@ -5,7 +5,18 @@
 This project have been forked from [vantonuk35/Fnf_bot](https://github.com/vantonuk35/Fnf_bot)
 Old repo https://github.com/Edouard127/Fnf_bot
 
-# GO CHECK SYSTEM REQUIREMENT !!
+### GO CHECK SYSTEM REQUIREMENT !!
+
+### How to use it ?
+
+Make sure the game is called " Friday Night Funkin' "
+If its not, download WinSpy++ to edit the window name 
+
+[WinSpy++](http://www.catch22.net/assets/files/software/WinSpy17.zip)
+[Tutorial WinSpy++](https://user-images.githubusercontent.com/46357922/125144989-c2806f00-e0ed-11eb-94bd-bd27fa49539a.mp4)
+
+The bot only work if the game is windowed in the middle of the screen
+Make sure the arrows colors are not custom
 
 [How to build the code ?](https://edouard127.github.io/Fnf_bot/)
 
@@ -18,17 +29,7 @@ Thanks to our supporter
 Bot detecting Arrows using color checking
 
 
-### How to use it ?
 
-Make sure the game is called " Friday Night Funkin' "
-If its not, download WinSpy++ to edit the window name 
-
-[WinSpy++](http://www.catch22.net/assets/files/software/WinSpy17.zip)
-
-[Using WinSpy++](https://user-images.githubusercontent.com/46357922/125144989-c2806f00-e0ed-11eb-94bd-bd27fa49539a.mp4)
-
-The bot only work if the game is windowed in the middle of the screen
-Make sure the arrows colors are not custom
 
 ### Requirement
 ___________________
