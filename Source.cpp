@@ -2,7 +2,6 @@
 #define USE_UNIFIED_MEM
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
-#include <opencv2/core/cuda.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <Windows.h>
@@ -26,7 +25,7 @@
 
 
 
-auto get_time()
+auto get_time() // Time ms
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch()
@@ -134,12 +133,12 @@ std::string WStringToString(const std::wstring& wstr)
 {
 	std::string str(wstr.length(), ' ');
 	std::copy(wstr.begin(), wstr.end(), str.begin());
-	return str;
+	return std::string(wstr.begin(), wstr.end());
 }
 
 int main()
 {
-	
+
 	HWND game_window = FindWindowA(NULL, "Friday Night Funkin'");
 	DXScreenShoter11 screen_shot_manager;
 	screen_shot_manager.Init();
@@ -147,19 +146,16 @@ int main()
 	int down_scale = 11;
 	int pixel_reaction_sum = 1000;
 	ArrowHandler arrow_handler(pixel_reaction_sum);
-
 	while (game_window = FindWindowA(NULL, "Friday Night Funkin'"))
 	{
-		auto t_start = std::chrono::high_resolution_clock::now();
-		auto t_end_read = std::chrono::high_resolution_clock::now();
 		static auto last_time = get_time();
-		std::cout << (get_time() - last_time).count() << "\t milliseconds " << '\n';
+		std::cout << (get_time() - last_time).count() << " ms " << '\n'; // Print time between note scan in ms 10 ms & - = Good
 		last_time = get_time();
 		cv::Mat src = screen_shot_manager.Take();
 		cv::Mat hsv_src;
 		Cut_screenshot_to_arrow_zone(src, down_scale, game_window);
-		cv::cvtColor(src, hsv_src, cv::COLOR_BGR2HSV);
-		arrow_handler.ProcessImage(hsv_src, game_window, down_scale);
+		cv::cvtColor(src, hsv_src, cv::COLOR_BGR2HSV); // Apply color filters
+		arrow_handler.ProcessImage(hsv_src, game_window, down_scale); // Render cutted zone
 	}
 	return 0;
 }
