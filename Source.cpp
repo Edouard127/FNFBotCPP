@@ -1,13 +1,14 @@
 #pragma comment(lib,"opencv_world453.lib")
 #define USE_UNIFIED_MEM
+#define down_scale 10 // DON'T EDIT
+#define pixel_reaction_sum 1000 // DON'T EDIT
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <Windows.h>
-
+#include "ScreenShoter.h"
+#include <opencv2/cudawarping.hpp>
+#include <opencv2/core/mat.hpp>
+#include <tchar.h>
 #include <chrono>
-#include <unordered_map>
 #include <Atlbase.h>
 #include <comdef.h>
 #include <memory>
@@ -15,11 +16,19 @@
 #include <string>
 #include <windows.h>
 #include <shlobj.h>
-#include <future>
-#include "ScreenShoter.h"
-#include <DXGI.h>
-#include <time.h>
-#include <shlobj.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <d3d11.h>
+#include <DXGIType.h>
+#include <dxgi1_2.h>
+#include <processthreadsapi.h>
+#include <tlhelp32.h>
+#pragma comment(lib, "d3d9.lib")
+#pragma comment(lib, "d3dx9.lib")
+#pragma comment(lib, "D3D11.lib")
+#pragma comment(lib, "D3d9.lib")
+#pragma comment(lib, "dxgi.lib")
+typedef const cv::_InputArray& InputArray;
 
 
 
@@ -46,7 +55,7 @@ public:
 	}
 	cv::Mat FilterImage(cv::Mat Input, int downscale_factor)
 	{
-		cv::Rect new_size = { _arrow_num * 160 / downscale_factor, 0, 160 / downscale_factor, Input.rows };
+		cv::Rect new_size = { _arrow_num * 160 / down_scale, 0, 160 / down_scale, Input.rows };
 		Input = Input(new_size);
 		cv::Mat Additional, Output;
 		Output = cv::Mat::zeros(Input.rows, Input.cols, CV_8UC1);
@@ -101,7 +110,7 @@ class ArrowHandler
 	};
 	int TrashHold;
 
-	void SendOutput(cv::Mat InputMatrix, HWND GameWindow, unsigned char VK)
+	void SendOutput(cv::Mat InputMatrix, HWND GameWindow, char VK)
 	{
 		SendMessageA(GameWindow, cv::sum(InputMatrix)[0] > TrashHold ? WM_KEYDOWN : WM_KEYUP, VK, 1);
 	}
@@ -113,7 +122,7 @@ public:
 	{
 		for (auto& [arrow_id, arrow_instance] : Arrows)
 		{
-			SendOutput(arrow_instance.FilterImage(Input, downscale_factor), gameWindow, arrow_id);
+			SendOutput(arrow_instance.FilterImage(Input, down_scale), gameWindow, arrow_id);
 		}
 	}
 };
@@ -122,13 +131,18 @@ void Cut_screenshot_to_arrow_zone(cv::Mat& Input, int downscale_factor, HWND gam
 {
 	RECT gameRect;
 	GetWindowRect(game_window, &gameRect);
-	Input = Input({ gameRect.left, gameRect.top, gameRect.right - gameRect.left, gameRect.bottom - gameRect.top });
-	cv::resize(Input, Input,
-		{ 1920 / downscale_factor, 1080 / downscale_factor });
-	Input = Input({ 1920 / downscale_factor / 2 + int(100 / downscale_factor), int(120 / downscale_factor),
-		1920 / downscale_factor / 2 - int(310 / downscale_factor), 1080 / downscale_factor / 4 - int(160 / downscale_factor) });
+	try
+	{
+		Input = Input({ gameRect.left, gameRect.top, gameRect.right - gameRect.left, gameRect.bottom - gameRect.top });
+		cv::resize(Input, Input, cv::Size{ 192, 108 });
+		Input = Input({ 1920 / downscale_factor / 2 + int(100 / downscale_factor), int(120 / downscale_factor), 1920 / downscale_factor / 2 - int(310 / downscale_factor), 1080 / downscale_factor / 4 - int(160 / downscale_factor) });
+	}
+	catch (cv::Exception& e)
+	{
+		std::cout << e.msg << std::endl; // output exception message
+	}
 }
-std::vector <IDXGIAdapter*> vAdapters;
+
 std::string WStringToString(const std::wstring& wstr)
 {
 	std::string str(wstr.length(), ' ');
@@ -136,26 +150,25 @@ std::string WStringToString(const std::wstring& wstr)
 	return std::string(wstr.begin(), wstr.end());
 }
 
-int main()
+int main(void)
 {
 
-	HWND game_window = FindWindowA(NULL, "Friday Night Funkin'");
+	HWND game_window = FindWindowA(nullptr, "Friday Night Funkin'");
 	DXScreenShoter11 screen_shot_manager;
 	screen_shot_manager.Init();
-
-	int down_scale = 11;
-	int pixel_reaction_sum = 1000;
 	ArrowHandler arrow_handler(pixel_reaction_sum);
-	while (game_window = FindWindowA(NULL, "Friday Night Funkin'"))
+	cv::namedWindow("output_target");
+	while (game_window = FindWindowA(nullptr, "Friday Night Funkin'"))
 	{
+		cv::Mat src = screen_shot_manager.Take();
+		cv::Mat hsv_src;
 		static auto last_time = get_time();
 		std::cout << (get_time() - last_time).count() << " ms " << '\n'; // Print time between note scan in ms 10 ms & - = Good
 		last_time = get_time();
-		cv::Mat src = screen_shot_manager.Take();
-		cv::Mat hsv_src;
 		Cut_screenshot_to_arrow_zone(src, down_scale, game_window);
 		cv::cvtColor(src, hsv_src, cv::COLOR_BGR2HSV); // Apply color filters
 		arrow_handler.ProcessImage(hsv_src, game_window, down_scale); // Render cutted zone
+
 	}
 	return 0;
 }
