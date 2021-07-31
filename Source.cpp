@@ -157,7 +157,6 @@ int main(void)
 	DXScreenShoter11 screen_shot_manager;
 	screen_shot_manager.Init();
 	ArrowHandler arrow_handler(pixel_reaction_sum);
-	cv::namedWindow("output_target");
 	while (game_window = FindWindowA(nullptr, "Friday Night Funkin'"))
 	{
 		cv::Mat src = screen_shot_manager.Take();
