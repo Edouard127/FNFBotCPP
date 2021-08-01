@@ -5,7 +5,6 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include "ScreenShoter.h"
-#include <opencv2/cudawarping.hpp>
 #include <opencv2/core/mat.hpp>
 #include <tchar.h>
 #include <chrono>
@@ -36,7 +35,7 @@ typedef const cv::_InputArray& InputArray;
 
 auto get_time() // Time ms
 {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(
 		std::chrono::system_clock::now().time_since_epoch()
 		);
 }
@@ -134,8 +133,8 @@ void Cut_screenshot_to_arrow_zone(cv::Mat& Input, int downscale_factor, HWND gam
 	try
 	{
 		Input = Input({ gameRect.left, gameRect.top, gameRect.right - gameRect.left, gameRect.bottom - gameRect.top });
-		cv::resize(Input, Input, cv::Size{ 192, 108 });
-		Input = Input({ 1920 / downscale_factor / 2 + int(100 / downscale_factor), int(120 / downscale_factor), 1920 / downscale_factor / 2 - int(310 / downscale_factor), 1080 / downscale_factor / 4 - int(160 / downscale_factor) });
+		cv::resize(Input, Input, cv::Size{ 1920/downscale_factor, 1080/downscale_factor });
+		Input = Input({ 1920 / downscale_factor / 2 + int(90 / downscale_factor), int(110 / downscale_factor), 1920 / downscale_factor / 2 - int(300 / downscale_factor), 1080 / downscale_factor / 4 - int(150 / downscale_factor) });
 	}
 	catch (cv::Exception& e)
 	{
@@ -157,17 +156,18 @@ int main(void)
 	DXScreenShoter11 screen_shot_manager;
 	screen_shot_manager.Init();
 	ArrowHandler arrow_handler(pixel_reaction_sum);
+
 	while (game_window = FindWindowA(nullptr, "Friday Night Funkin'"))
 	{
 		cv::Mat src = screen_shot_manager.Take();
 		cv::Mat hsv_src;
 		static auto last_time = get_time();
-		std::cout << (get_time() - last_time).count() << " ms " << '\n'; // Print time between note scan in ms 10 ms & - = Good
 		last_time = get_time();
+		std::cout << (get_time() - last_time).count() << " ns" << std::endl;
+		
 		Cut_screenshot_to_arrow_zone(src, down_scale, game_window);
 		cv::cvtColor(src, hsv_src, cv::COLOR_BGR2HSV); // Apply color filters
 		arrow_handler.ProcessImage(hsv_src, game_window, down_scale); // Render cutted zone
-
 	}
 	return 0;
 }
