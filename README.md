@@ -1,4 +1,4 @@
-
+If you wish to contribute, add me on discord Kamigen^2#1087
 
 ### OpenCV Based bot for Friday Night Funkin'
 
