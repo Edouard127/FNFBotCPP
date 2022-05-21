@@ -1,6 +1,6 @@
 ### Project discontinued
 
-If you wish to contribute, add me on discord Kamigen#1087
+If you wish to contribute, add me on discord Kamigen#0001
 
 ### OpenCV Based bot for Friday Night Funkin'
 
